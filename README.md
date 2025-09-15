@@ -31,9 +31,9 @@ A WCAG 2.0/2.1/2.2 compliant color contrast checker for web accessibility. Test 
 - **Copy to Clipboard**: One-click copying of color values in HEX, RGB, and HSL formats
 
 ### ⌨️ Keyboard Shortcuts
-- `Alt + R`: Generate random color combination
-- `Alt + I`: Invert foreground and background colors
-- `Alt + C`: Copy current combination to clipboard
+- `Alt + R` (or `Option + R` on Mac): Generate random color combination
+- `Alt + I` (or `Option + I` on Mac): Invert foreground and background colors
+- `Alt + C` (or `Option + C` on Mac): Copy current combination to clipboard
 - `Escape`: Reset to default (black on white)
 
 ### ♿ Accessibility Features
