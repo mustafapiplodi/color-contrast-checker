@@ -105,8 +105,8 @@ class ColorContrastChecker {
                 this.copyCurrentCombination();
             }
 
-            // Ctrl/Cmd + Shift + 0: Reset to default (avoid Escape conflicts)
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === ')' || e.key === '0')) {
+            // Ctrl/Cmd + Shift + D: Reset to default (D for Default)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
                 e.preventDefault();
                 this.resetToDefault();
             }
@@ -822,10 +822,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show keyboard shortcuts help
     const showHelp = () => {
         alert(`Keyboard Shortcuts:
-• Ctrl + Shift + R: Random colors
-• Ctrl + Shift + I: Invert colors
-• Ctrl + Shift + C: Copy combination
-• Ctrl + Shift + 0: Reset to default`);
+• ⌃⇧R (Mac) / Ctrl+Shift+R (Win): Random colors
+• ⌃⇧I (Mac) / Ctrl+Shift+I (Win): Invert colors
+• ⌃⇧C (Mac) / Ctrl+Shift+C (Win): Copy combination
+• ⌃⇧D (Mac) / Ctrl+Shift+D (Win): Reset to default`);
     };
     
     // Add help trigger
