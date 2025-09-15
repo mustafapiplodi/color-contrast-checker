@@ -704,6 +704,39 @@ footer a:hover {
     transition: all 0.2s ease;
 }
 
+/* Error states for hex inputs */
+.hex-error {
+    color: #e53e3e;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+/* Problem indicator animations */
+@keyframes problemBlink {
+    0%, 50% { 
+        border-color: #f56565;
+        box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.3);
+    }
+    25%, 75% { 
+        border-color: #e53e3e;
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.5);
+    }
+}
+
+.preview-container.problem {
+    animation: problemBlink 2s ease-in-out infinite;
+}
+
+.quick-results.problem {
+    background: linear-gradient(135deg, #fed7d7 0%, #fbb6ce 100%);
+    border: 2px solid #f56565;
+}
+
+.quick-results.problem .ratio-mini-value {
+    animation: problemBlink 1.5s ease-in-out infinite;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     * {

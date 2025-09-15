@@ -141,64 +141,132 @@ class ColorContrastChecker {
     }
 
     handleHexInput(hexInput, colorInput) {
-        const value = hexInput.value;
+        let value = hexInput.value.trim();
         
-        // Auto-format hex input
-        if (value.length === 1 && value !== '#') {
-            hexInput.value = '#' + value;
-            return;
+        // Store previous valid value for fallback
+        if (!hexInput.dataset.previousValue && this.isValidHex(value)) {
+            hexInput.dataset.previousValue = value;
         }
         
-        if (this.isValidHex(value)) {
-            colorInput.value = value;
-            hexInput.style.borderColor = '#48bb78';
+        // Auto-add # if missing
+        if (value.length >= 1 && !value.startsWith('#')) {
+            value = '#' + value;
+            hexInput.value = value;
+        }
+        
+        // Process the hex value
+        const processedHex = this.processHexInput(value);
+        
+        if (processedHex.isValid) {
+            // Format to uppercase and store as previous valid value
+            const formattedHex = processedHex.hex.toUpperCase();
+            hexInput.value = formattedHex;
+            hexInput.dataset.previousValue = formattedHex;
+            colorInput.value = formattedHex;
+            
+            // Update styling and UI
+            this.setInputValidState(hexInput, true);
             this.debouncedUpdate();
-        } else if (value.length > 1) {
-            hexInput.style.borderColor = '#f56565';
         } else {
-            hexInput.style.borderColor = '#e2e8f0';
+            this.setInputValidState(hexInput, false, processedHex.error);
         }
+    }
+
+    processHexInput(hex) {
+        if (!hex || hex === '#') {
+            return { isValid: false, error: 'Enter a hex color code' };
+        }
+        
+        // Remove # for processing
+        const cleanHex = hex.slice(1);
+        
+        // Check for valid characters
+        if (!/^[A-Fa-f0-9]*$/.test(cleanHex)) {
+            return { isValid: false, error: 'Invalid characters (use 0-9, A-F only)' };
+        }
+        
+        // Handle different lengths
+        if (cleanHex.length === 3) {
+            // Expand 3-digit to 6-digit (e.g., f00 -> ff0000)
+            const expanded = cleanHex.split('').map(char => char + char).join('');
+            return { isValid: true, hex: '#' + expanded };
+        } else if (cleanHex.length === 6) {
+            return { isValid: true, hex: '#' + cleanHex };
+        } else if (cleanHex.length > 0 && cleanHex.length < 3) {
+            return { isValid: false, error: 'Too short (need 3 or 6 characters)' };
+        } else if (cleanHex.length > 6) {
+            return { isValid: false, error: 'Too long (max 6 characters)' };
+        } else {
+            return { isValid: false, error: 'Invalid hex format' };
+        }
+    }
+
+    setInputValidState(hexInput, isValid, errorMessage = '') {
+        const errorElement = hexInput.parentNode.querySelector('.hex-error');
+        
+        if (isValid) {
+            hexInput.style.borderColor = '#48bb78';
+            hexInput.style.backgroundColor = '#f0fff4';
+            if (errorElement) {
+                errorElement.remove();
+            }
+        } else {
+            hexInput.style.borderColor = '#f56565';
+            hexInput.style.backgroundColor = '#fed7d7';
+            this.showHexError(hexInput, errorMessage);
+        }
+    }
+
+    showHexError(hexInput, message) {
+        // Remove existing error
+        const existingError = hexInput.parentNode.querySelector('.hex-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Create new error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'hex-error';
+        errorDiv.textContent = message;
+        errorDiv.style.cssText = `
+            color: #e53e3e;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        `;
+        
+        hexInput.parentNode.appendChild(errorDiv);
     }
 
     validateHexInput(hexInput) {
-        if (!this.isValidHex(hexInput.value) && hexInput.value.length > 1) {
-            hexInput.style.borderColor = '#f56565';
-            // Show error tooltip or message
-            this.showTooltip(hexInput, 'Invalid hex color format');
-        } else {
-            hexInput.style.borderColor = '#e2e8f0';
-        }
-    }
-
-    showTooltip(element, message) {
-        // Simple tooltip implementation
-        const existingTooltip = element.parentNode.querySelector('.tooltip');
-        if (existingTooltip) {
-            existingTooltip.remove();
-        }
-
-        const tooltip = document.createElement('div');
-        tooltip.className = 'tooltip';
-        tooltip.textContent = message;
-        tooltip.style.cssText = `
-            position: absolute;
-            background: #2d3748;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            z-index: 1000;
-            margin-top: 0.25rem;
-        `;
+        const value = hexInput.value.trim();
         
-        element.parentNode.style.position = 'relative';
-        element.parentNode.appendChild(tooltip);
+        if (!value || value === '#') {
+            // Restore previous valid value if available
+            if (hexInput.dataset.previousValue) {
+                hexInput.value = hexInput.dataset.previousValue;
+                const colorInput = hexInput.id.includes('foreground') ? this.foregroundColorInput : this.backgroundColorInput;
+                colorInput.value = hexInput.dataset.previousValue;
+                this.setInputValidState(hexInput, true);
+                this.debouncedUpdate();
+            }
+            return;
+        }
         
-        setTimeout(() => tooltip.remove(), 3000);
+        const processedHex = this.processHexInput(value);
+        if (!processedHex.isValid && hexInput.dataset.previousValue) {
+            // Restore previous valid value
+            hexInput.value = hexInput.dataset.previousValue;
+            const colorInput = hexInput.id.includes('foreground') ? this.foregroundColorInput : this.backgroundColorInput;
+            colorInput.value = hexInput.dataset.previousValue;
+            this.setInputValidState(hexInput, true);
+        }
     }
 
     isValidHex(hex) {
-        return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
+        if (!hex) return false;
+        const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+        return /^[A-Fa-f0-9]{3}$|^[A-Fa-f0-9]{6}$/.test(cleanHex);
     }
 
     debouncedUpdate() {
@@ -253,13 +321,24 @@ class ColorContrastChecker {
     }
 
     getRelativeLuminance(r, g, b) {
+        // Ensure RGB values are integers and within valid range
+        r = Math.max(0, Math.min(255, Math.round(r)));
+        g = Math.max(0, Math.min(255, Math.round(g)));
+        b = Math.max(0, Math.min(255, Math.round(b)));
+        
         const [vR, vG, vB] = [r / 255, g / 255, b / 255];
         
-        const linearR = vR <= 0.04045 ? vR / 12.92 : Math.pow((vR + 0.055) / 1.055, 2.4);
-        const linearG = vG <= 0.04045 ? vG / 12.92 : Math.pow((vG + 0.055) / 1.055, 2.4);
-        const linearB = vB <= 0.04045 ? vB / 12.92 : Math.pow((vB + 0.055) / 1.055, 2.4);
+        // Use higher precision for the linearization threshold and calculations
+        const threshold = 0.04045;
+        const linearR = vR <= threshold ? vR / 12.92 : Math.pow((vR + 0.055) / 1.055, 2.4);
+        const linearG = vG <= threshold ? vG / 12.92 : Math.pow((vG + 0.055) / 1.055, 2.4);
+        const linearB = vB <= threshold ? vB / 12.92 : Math.pow((vB + 0.055) / 1.055, 2.4);
         
-        return 0.2126 * linearR + 0.7152 * linearG + 0.0722 * linearB;
+        // ITU-R BT.709 coefficients with full precision
+        const luminance = 0.2126 * linearR + 0.7152 * linearG + 0.0722 * linearB;
+        
+        // Round to avoid floating point precision issues
+        return Math.round(luminance * 1000000) / 1000000;
     }
 
     getContrastRatio(hex1, hex2) {
@@ -274,7 +353,12 @@ class ColorContrastChecker {
         const lighter = Math.max(lum1, lum2);
         const darker = Math.min(lum1, lum2);
         
-        return (lighter + 0.05) / (darker + 0.05);
+        // Calculate contrast ratio with precision handling
+        const contrastRatio = (lighter + 0.05) / (darker + 0.05);
+        
+        // Round to 3 decimal places to avoid floating point precision issues
+        // but maintain enough precision for accurate WCAG compliance checking
+        return Math.round(contrastRatio * 1000) / 1000;
     }
 
     updateResults() {
@@ -327,11 +411,30 @@ class ColorContrastChecker {
     }
 
     updateQuickResults(contrastRatio, compliance) {
-        // Update mini contrast ratio
-        this.contrastRatioMini.textContent = contrastRatio.toFixed(2) + ':1';
+        const areColorsIdentical = this.checkIdenticalColors();
+        const areColorsNearIdentical = this.checkNearIdenticalColors(contrastRatio);
+        
+        // Update mini contrast ratio with special formatting for problematic cases
+        if (areColorsIdentical) {
+            this.contrastRatioMini.textContent = '1.00:1';
+            this.contrastRatioMini.style.color = '#e53e3e';
+            this.contrastRatioMini.style.fontWeight = '900';
+        } else if (areColorsNearIdentical) {
+            this.contrastRatioMini.textContent = contrastRatio.toFixed(2) + ':1';
+            this.contrastRatioMini.style.color = '#e53e3e';
+            this.contrastRatioMini.style.fontWeight = '900';
+        } else {
+            this.contrastRatioMini.textContent = contrastRatio.toFixed(2) + ':1';
+            this.contrastRatioMini.style.color = '#2d3748';
+            this.contrastRatioMini.style.fontWeight = '700';
+        }
         
         // Update AA status
-        if (compliance['aa-normal']) {
+        if (areColorsIdentical || areColorsNearIdentical) {
+            this.aaStatusMini.textContent = 'AA ✗';
+            this.aaStatusMini.className = 'status-badge status-fail';
+            this.aaStatusMini.title = `WCAG AA compliance: CRITICAL FAILURE - Colors are ${areColorsIdentical ? 'identical' : 'nearly identical'}`;
+        } else if (compliance['aa-normal']) {
             this.aaStatusMini.textContent = 'AA ✓';
             this.aaStatusMini.className = 'status-badge status-pass';
             this.aaStatusMini.title = `WCAG AA compliance: PASSED (${contrastRatio.toFixed(2)}:1 ≥ 4.5:1)`;
@@ -342,7 +445,11 @@ class ColorContrastChecker {
         }
         
         // Update AAA status
-        if (compliance['aaa-normal']) {
+        if (areColorsIdentical || areColorsNearIdentical) {
+            this.aaaStatusMini.textContent = 'AAA ✗';
+            this.aaaStatusMini.className = 'status-badge status-fail';
+            this.aaaStatusMini.title = `WCAG AAA compliance: CRITICAL FAILURE - Colors are ${areColorsIdentical ? 'identical' : 'nearly identical'}`;
+        } else if (compliance['aaa-normal']) {
             this.aaaStatusMini.textContent = 'AAA ✓';
             this.aaaStatusMini.className = 'status-badge status-pass';
             this.aaaStatusMini.title = `WCAG AAA compliance: PASSED (${contrastRatio.toFixed(2)}:1 ≥ 7:1)`;
@@ -352,8 +459,12 @@ class ColorContrastChecker {
             this.aaaStatusMini.title = `WCAG AAA compliance: FAILED (${contrastRatio.toFixed(2)}:1 < 7:1)`;
         }
         
-        // Update overall grade
-        if (compliance['aaa-normal']) {
+        // Update overall grade with improved logic
+        if (areColorsIdentical || areColorsNearIdentical) {
+            this.overallGrade.textContent = 'F';
+            this.overallGrade.className = 'grade-badge grade-poor';
+            this.overallGrade.title = 'Critical failure - content is invisible or nearly invisible';
+        } else if (compliance['aaa-normal']) {
             this.overallGrade.textContent = 'A+';
             this.overallGrade.className = 'grade-badge grade-excellent';
             this.overallGrade.title = 'Excellent accessibility - exceeds all standards';
@@ -392,9 +503,23 @@ class ColorContrastChecker {
     }
 
     updatePreview(foregroundColor, backgroundColor) {
+        const areColorsIdentical = this.checkIdenticalColors();
+        const contrastRatio = this.getContrastRatio(foregroundColor, backgroundColor);
+        const areColorsNearIdentical = this.checkNearIdenticalColors(contrastRatio);
+        
         this.previewContainer.style.color = foregroundColor;
         this.previewContainer.style.backgroundColor = backgroundColor;
         this.previewContainer.style.setProperty('--bg-color', backgroundColor);
+        
+        // Add problem indicator for identical or near-identical colors
+        const quickResults = document.getElementById('quick-results');
+        if (areColorsIdentical || areColorsNearIdentical) {
+            this.previewContainer.classList.add('problem');
+            quickResults.classList.add('problem');
+        } else {
+            this.previewContainer.classList.remove('problem');
+            quickResults.classList.remove('problem');
+        }
         
         const samples = this.previewContainer.querySelectorAll('.sample-button, .sample-input, .sample-card');
         samples.forEach(sample => {
@@ -405,18 +530,37 @@ class ColorContrastChecker {
     }
 
     updateRecommendations(contrastRatio, compliance) {
+        // Check for identical or near-identical colors
+        const areColorsIdentical = this.checkIdenticalColors();
+        const areColorsNearIdentical = this.checkNearIdenticalColors(contrastRatio);
+        
         // Update overall assessment
-        this.updateOverallAssessment(contrastRatio, compliance);
+        this.updateOverallAssessment(contrastRatio, compliance, areColorsIdentical, areColorsNearIdentical);
         
         // Update suggestions
-        this.updateSuggestions(contrastRatio, compliance);
+        this.updateSuggestions(contrastRatio, compliance, areColorsIdentical, areColorsNearIdentical);
     }
 
-    updateOverallAssessment(contrastRatio, compliance) {
+    checkIdenticalColors() {
+        return this.foregroundColorInput.value.toUpperCase() === this.backgroundColorInput.value.toUpperCase();
+    }
+
+    checkNearIdenticalColors(contrastRatio) {
+        // Consider colors "near identical" if contrast is very low
+        return contrastRatio < 1.1 && contrastRatio !== 1;
+    }
+
+    updateOverallAssessment(contrastRatio, compliance, areColorsIdentical, areColorsNearIdentical) {
         const overallDiv = document.getElementById('overall-status');
         let message, className;
 
-        if (compliance['aaa-normal']) {
+        if (areColorsIdentical) {
+            message = `⚠️ Warning: Identical colors detected! Foreground and background are the same color (${this.foregroundColorInput.value.toUpperCase()}), making content completely invisible. Please choose different colors.`;
+            className = 'status-poor';
+        } else if (areColorsNearIdentical) {
+            message = `⚠️ Critical: Nearly identical colors detected! Your contrast ratio of ${contrastRatio.toFixed(2)}:1 makes content almost invisible. Please choose more distinct colors.`;
+            className = 'status-poor';
+        } else if (compliance['aaa-normal']) {
             message = `🌟 Excellent! Your contrast ratio of ${contrastRatio.toFixed(2)}:1 exceeds all WCAG standards and provides optimal accessibility for all users.`;
             className = 'status-excellent';
         } else if (compliance['aa-normal']) {
@@ -434,27 +578,55 @@ class ColorContrastChecker {
         this.overallMessage.className = className;
     }
 
-    updateSuggestions(contrastRatio, compliance) {
+    updateSuggestions(contrastRatio, compliance, areColorsIdentical, areColorsNearIdentical) {
         const suggestions = [];
 
-        if (!compliance['aa-normal']) {
+        if (areColorsIdentical) {
+            suggestions.push({
+                type: 'error',
+                text: 'Urgent: Change either the foreground or background color to create visible contrast.'
+            });
+            suggestions.push({
+                type: 'error',
+                text: 'Quick fix: Try using black (#000000) on white (#FFFFFF) or white (#FFFFFF) on black (#000000).'
+            });
+        } else if (areColorsNearIdentical) {
+            suggestions.push({
+                type: 'error',
+                text: 'Critical: Colors are too similar. Increase the difference between foreground and background.'
+            });
+            suggestions.push({
+                type: 'warning',
+                text: 'Try making one color much darker or much lighter to achieve better contrast.'
+            });
+        } else if (!compliance['aa-normal']) {
             if (contrastRatio < 3.0) {
                 suggestions.push({
                     type: 'error',
                     text: 'Critical: This color combination fails basic accessibility standards. Consider using much darker/lighter colors.'
+                });
+                suggestions.push({
+                    type: 'warning',
+                    text: `Current ratio: ${contrastRatio.toFixed(2)}:1. Target: At least 4.5:1 for normal text.`
                 });
             } else {
                 suggestions.push({
                     type: 'warning',
                     text: 'To meet WCAG AA standards, try darkening the text color or lightening the background.'
                 });
+                suggestions.push({
+                    type: 'warning',
+                    text: `You need ${(4.5 - contrastRatio).toFixed(1)} more contrast points to reach AA compliance.`
+                });
             }
-        }
-
-        if (compliance['aa-normal'] && !compliance['aaa-normal']) {
+        } else if (compliance['aa-normal'] && !compliance['aaa-normal']) {
             suggestions.push({
                 type: 'success',
                 text: 'Good accessibility! For even better contrast, consider darker text or lighter background to reach AAA standards.'
+            });
+            suggestions.push({
+                type: 'success',
+                text: `You need ${(7.0 - contrastRatio).toFixed(1)} more contrast points to reach AAA level.`
             });
         }
 
@@ -463,6 +635,26 @@ class ColorContrastChecker {
                 type: 'success',
                 text: 'Excellent contrast! This combination works well in all lighting conditions and for users with vision impairments.'
             });
+        }
+
+        // Add specific numeric guidance
+        if (!areColorsIdentical && !areColorsNearIdentical && contrastRatio < 4.5) {
+            const fgRgb = this.hexToRgb(this.foregroundColorInput.value);
+            const bgRgb = this.hexToRgb(this.backgroundColorInput.value);
+            const fgLuminance = this.getRelativeLuminance(...fgRgb);
+            const bgLuminance = this.getRelativeLuminance(...bgRgb);
+            
+            if (fgLuminance > bgLuminance) {
+                suggestions.push({
+                    type: 'warning',
+                    text: 'Tip: Try darkening the foreground color or lightening the background color.'
+                });
+            } else {
+                suggestions.push({
+                    type: 'warning',
+                    text: 'Tip: Try lightening the foreground color or darkening the background color.'
+                });
+            }
         }
 
         // Render suggestions
