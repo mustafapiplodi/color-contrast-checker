@@ -87,20 +87,20 @@ class ColorContrastChecker {
 
     addKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // Alt + R: Random colors
-            if (e.altKey && e.key === 'r' && !e.ctrlKey && !e.metaKey) {
+            // Ctrl/Cmd + Shift + R: Random colors (avoid plain Ctrl+R refresh)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
                 e.preventDefault();
                 this.generateRandomColors();
             }
 
-            // Alt + I: Invert colors
-            if (e.altKey && e.key === 'i' && !e.ctrlKey && !e.metaKey) {
+            // Ctrl/Cmd + Shift + I: Invert colors (avoid dev tools)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'I') {
                 e.preventDefault();
                 this.invertColors();
             }
 
-            // Alt + C: Copy current combination
-            if (e.altKey && e.key === 'c' && !e.ctrlKey && !e.metaKey && !e.target.matches('input')) {
+            // Ctrl/Cmd + Shift + C: Copy current combination (avoid system copy)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C' && !e.target.matches('input')) {
                 e.preventDefault();
                 this.copyCurrentCombination();
             }
@@ -821,9 +821,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show keyboard shortcuts help
     const showHelp = () => {
         alert(`Keyboard Shortcuts:
-• Alt + R: Random colors
-• Alt + I: Invert colors
-• Alt + C: Copy combination
+• Ctrl/Cmd + Shift + R: Random colors
+• Ctrl/Cmd + Shift + I: Invert colors
+• Ctrl/Cmd + Shift + C: Copy combination
 • Escape: Reset to default`);
     };
     
