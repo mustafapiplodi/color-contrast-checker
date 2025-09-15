@@ -110,6 +110,15 @@ input[type="color"] {
     transition: border-color 0.2s ease;
 }
 
+/* Mobile-friendly color picker */
+@media (max-width: 768px) {
+    input[type="color"] {
+        width: 80px;
+        height: 50px;
+        border-width: 3px;
+    }
+}
+
 input[type="color"]:hover {
     border-color: #4299e1;
 }
@@ -128,6 +137,16 @@ input[type="text"] {
     min-width: 120px;
     background: white;
     transition: border-color 0.2s ease;
+}
+
+/* Mobile-friendly text inputs */
+@media (max-width: 768px) {
+    input[type="text"] {
+        padding: 1rem;
+        font-size: 1rem;
+        min-width: 140px;
+        border-width: 3px;
+    }
 }
 
 input[type="text"]:focus {
@@ -522,6 +541,20 @@ input[type="text"]:focus {
     transition: background-color 0.2s ease;
 }
 
+/* Touch-friendly copy buttons */
+@media (max-width: 768px) {
+    .copy-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
 .copy-btn:hover {
     background: #3182ce;
 }
@@ -560,6 +593,24 @@ input[type="text"]:focus {
     font-weight: 500;
     text-align: center;
     font-size: 0.8rem;
+}
+
+/* Mobile-friendly preset buttons */
+@media (max-width: 768px) {
+    .presets-grid-left {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .preset-btn {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+        border-width: 3px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .preset-btn:hover {
@@ -627,11 +678,54 @@ footer a:hover {
     text-decoration: underline;
 }
 
+/* Mobile-first layout improvements */
+@media (max-width: 767px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    section {
+        padding: 1.5rem;
+    }
+
+    main {
+        gap: 1rem;
+    }
+
+    .color-picker-container {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+
+    .preview-ui-elements {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .sample-button,
+    .sample-input,
+    .sample-card {
+        min-height: 48px;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+}
+
 /* Responsive design */
 @media (min-width: 768px) {
     main {
         grid-template-columns: 1fr 1fr;
-        grid-template-areas: 
+        grid-template-areas:
             "inputs preview"
             "results results"
             "recommendations-left recommendations-right"
