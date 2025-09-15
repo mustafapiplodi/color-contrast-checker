@@ -31,10 +31,10 @@ A WCAG 2.0/2.1/2.2 compliant color contrast checker for web accessibility. Test 
 - **Copy to Clipboard**: One-click copying of color values in HEX, RGB, and HSL formats
 
 ### ⌨️ Keyboard Shortcuts
-- `Ctrl + Shift + R` (or `Cmd + Shift + R` on Mac): Generate random color combination
-- `Ctrl + Shift + I` (or `Cmd + Shift + I` on Mac): Invert foreground and background colors
-- `Ctrl + Shift + C` (or `Cmd + Shift + C` on Mac): Copy current combination to clipboard
-- `Escape`: Reset to default (black on white)
+- `Ctrl + Shift + R`: Generate random color combination
+- `Ctrl + Shift + I`: Invert foreground and background colors
+- `Ctrl + Shift + C`: Copy current combination to clipboard
+- `Ctrl + Shift + 0`: Reset to default (black on white)
 
 ### ♿ Accessibility Features
 - **ARIA Labels**: Screen reader support with descriptive labels
