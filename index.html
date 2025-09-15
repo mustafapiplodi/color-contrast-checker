@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Contrast Checker - WCAG Compliance Tool</title>
     <meta name="description" content="Professional WCAG 2.0/2.1/2.2 compliant color contrast checker for web accessibility">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -34,10 +37,38 @@
                 </div>
                 <p id="background-help" class="help-text">Select the background color</p>
             </div>
+            
+            <!-- Quick Presets moved to left side -->
+            <div class="quick-presets-left">
+                <h3>Quick Presets</h3>
+                <div class="presets-grid-left">
+                    <button class="preset-btn" data-fg="#000000" data-bg="#ffffff">Black on White</button>
+                    <button class="preset-btn" data-fg="#ffffff" data-bg="#000000">White on Black</button>
+                    <button class="preset-btn" data-fg="#1a365d" data-bg="#ffffff">Dark Blue on White</button>
+                    <button class="preset-btn" data-fg="#2d3748" data-bg="#f7fafc">Charcoal on Light Gray</button>
+                    <button class="preset-btn" data-fg="#744210" data-bg="#fef5e7">Brown on Cream</button>
+                    <button class="preset-btn" data-fg="#22543d" data-bg="#f0fff4">Forest on Mint</button>
+                    <button class="preset-btn" data-fg="#742a2a" data-bg="#fed7d7">Maroon on Light Pink</button>
+                    <button class="preset-btn" data-fg="#553c9a" data-bg="#faf5ff">Purple on Lavender</button>
+                </div>
+            </div>
         </section>
 
         <section class="preview-section" aria-labelledby="preview-heading">
             <h2 id="preview-heading">Live Preview</h2>
+            
+            <!-- Quick Results Summary -->
+            <div class="quick-results" id="quick-results">
+                <div class="contrast-ratio-mini">
+                    <span class="ratio-mini-label">Contrast:</span>
+                    <span id="contrast-ratio-mini" class="ratio-mini-value">21.00:1</span>
+                </div>
+                <div class="compliance-mini">
+                    <span id="aa-status-mini" class="status-badge status-pass" title="WCAG AA compliance for normal text (4.5:1 required)">AA ✓</span>
+                    <span id="aaa-status-mini" class="status-badge status-pass" title="WCAG AAA compliance for normal text (7:1 required)">AAA ✓</span>
+                    <span id="overall-grade" class="grade-badge grade-excellent" title="Overall accessibility grade">A+</span>
+                </div>
+            </div>
             
             <div class="preview-container" id="preview-container">
                 <div class="preview-text-samples">
@@ -55,15 +86,10 @@
         </section>
 
         <section class="results-section" aria-labelledby="results-heading">
-            <h2 id="results-heading">Contrast Results</h2>
-            
-            <div class="contrast-ratio-display">
-                <span class="ratio-label">Contrast Ratio:</span>
-                <span id="contrast-ratio" class="ratio-value" aria-live="polite">21.00:1</span>
-            </div>
+            <h2 id="results-heading">Detailed Compliance Results</h2>
 
             <div class="compliance-indicators" role="group" aria-labelledby="compliance-heading">
-                <h3 id="compliance-heading">WCAG Compliance</h3>
+                <h3 id="compliance-heading">WCAG Compliance Details</h3>
                 
                 <div class="compliance-grid">
                     <div class="compliance-item">
@@ -93,6 +119,76 @@
                 </div>
             </div>
         </section>
+
+        <section class="recommendations-section-left" aria-labelledby="recommendations-heading-left">
+            <h2 id="recommendations-heading-left">Recommendations & Guidance</h2>
+            
+            <div class="recommendation-card" id="overall-status">
+                <h3>Overall Assessment</h3>
+                <p id="overall-message">Your color combination has excellent contrast and meets all accessibility standards.</p>
+            </div>
+            
+            <div class="recommendation-card" id="wcag-explanation">
+                <h3>WCAG Guidelines Explained</h3>
+                <div class="wcag-info">
+                    <div class="wcag-level">
+                        <strong>AA Level (Minimum):</strong>
+                        <ul>
+                            <li>Normal text: 4.5:1 contrast ratio</li>
+                            <li>Large text (18pt+/14pt+ bold): 3:1 contrast ratio</li>
+                            <li>Required for legal compliance in many regions</li>
+                        </ul>
+                    </div>
+                    <div class="wcag-level">
+                        <strong>AAA Level (Enhanced):</strong>
+                        <ul>
+                            <li>Normal text: 7:1 contrast ratio</li>
+                            <li>Large text: 4.5:1 contrast ratio</li>
+                            <li>Recommended for maximum accessibility</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="recommendations-section-right" aria-labelledby="recommendations-heading-right">
+            <h2 id="recommendations-heading-right">Improvement Tools</h2>
+            
+            <div class="recommendation-card" id="improvement-suggestions">
+                <h3>Suggestions for Improvement</h3>
+                <div id="suggestions-list" class="suggestions-list">
+                    <!-- Dynamic suggestions will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <h3>Color Format Converter</h3>
+                <div class="color-formats">
+                    <div class="format-group">
+                        <label>HEX:</label>
+                        <div class="format-display">
+                            <span id="format-hex-fg">#000000</span> / <span id="format-hex-bg">#ffffff</span>
+                            <button class="copy-btn" data-copy="hex" title="Copy HEX values">📋</button>
+                        </div>
+                    </div>
+                    <div class="format-group">
+                        <label>RGB:</label>
+                        <div class="format-display">
+                            <span id="format-rgb-fg">rgb(0,0,0)</span> / <span id="format-rgb-bg">rgb(255,255,255)</span>
+                            <button class="copy-btn" data-copy="rgb" title="Copy RGB values">📋</button>
+                        </div>
+                    </div>
+                    <div class="format-group">
+                        <label>HSL:</label>
+                        <div class="format-display">
+                            <span id="format-hsl-fg">hsl(0,0%,0%)</span> / <span id="format-hsl-bg">hsl(0,0%,100%)</span>
+                            <button class="copy-btn" data-copy="hsl" title="Copy HSL values">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <section class="additional-tools" aria-labelledby="tools-heading">
             <h2 id="tools-heading">Additional Information</h2>
