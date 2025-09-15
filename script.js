@@ -73,11 +73,11 @@ class ColorContrastChecker {
 
         // Hex input changes with validation
         this.foregroundHexInput.addEventListener('input', () => {
-            this.handleHexInput(this.foregroundHexInput, this.foregroundColorInput);
+            this.handleHexInputRealtime(this.foregroundHexInput, this.foregroundColorInput);
         });
 
         this.backgroundHexInput.addEventListener('input', () => {
-            this.handleHexInput(this.backgroundHexInput, this.backgroundColorInput);
+            this.handleHexInputRealtime(this.backgroundHexInput, this.backgroundColorInput);
         });
 
         // Real-time validation feedback
@@ -140,7 +140,7 @@ class ColorContrastChecker {
         });
     }
 
-    handleHexInput(hexInput, colorInput) {
+    handleHexInputRealtime(hexInput, colorInput) {
         let value = hexInput.value.trim();
         
         // Store previous valid value for fallback
@@ -148,10 +148,42 @@ class ColorContrastChecker {
             hexInput.dataset.previousValue = value;
         }
         
-        // Auto-add # if missing
-        if (value.length >= 1 && !value.startsWith('#')) {
+        // Only auto-add # if the user hasn't started typing a valid hex character
+        if (value.length === 1 && !value.startsWith('#') && /^[A-Fa-f0-9]$/.test(value)) {
             value = '#' + value;
             hexInput.value = value;
+        }
+        
+        // Clear any existing timers
+        if (hexInput.validationTimer) {
+            clearTimeout(hexInput.validationTimer);
+        }
+        
+        // Debounce validation to allow complete typing
+        hexInput.validationTimer = setTimeout(() => {
+            this.handleHexInput(hexInput, colorInput);
+        }, 1500); // Wait 1.5 seconds after user stops typing
+        
+        // Provide immediate visual feedback without changing the value
+        const processedHex = this.processHexInput(value);
+        if (processedHex.isValid) {
+            this.setInputValidState(hexInput, true);
+        } else if (value.length >= 4) { // Only show errors after reasonable input length
+            this.setInputValidState(hexInput, false, processedHex.error);
+        } else {
+            // Neutral state while typing
+            hexInput.style.borderColor = '#cbd5e0';
+            hexInput.style.backgroundColor = 'white';
+            this.clearHexError(hexInput);
+        }
+    }
+
+    handleHexInput(hexInput, colorInput) {
+        let value = hexInput.value.trim();
+        
+        // Store previous valid value for fallback
+        if (!hexInput.dataset.previousValue && this.isValidHex(value)) {
+            hexInput.dataset.previousValue = value;
         }
         
         // Process the hex value
@@ -236,6 +268,13 @@ class ColorContrastChecker {
         `;
         
         hexInput.parentNode.appendChild(errorDiv);
+    }
+
+    clearHexError(hexInput) {
+        const existingError = hexInput.parentNode.querySelector('.hex-error');
+        if (existingError) {
+            existingError.remove();
+        }
     }
 
     validateHexInput(hexInput) {
