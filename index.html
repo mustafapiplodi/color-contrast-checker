@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Contrast Checker - WCAG Compliance Tool</title>
+    <meta name="description" content="Professional WCAG 2.0/2.1/2.2 compliant color contrast checker for web accessibility">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Color Contrast Checker</h1>
+        <p>WCAG 2.0/2.1/2.2 Compliant Accessibility Tool</p>
+    </header>
+
+    <main>
+        <section class="color-inputs" aria-labelledby="color-inputs-heading">
+            <h2 id="color-inputs-heading">Color Selection</h2>
+            
+            <div class="color-input-group">
+                <label for="foreground-color">Foreground Color (Text)</label>
+                <div class="color-picker-container">
+                    <input type="color" id="foreground-color" value="#000000" aria-describedby="foreground-help">
+                    <input type="text" id="foreground-hex" value="#000000" aria-label="Foreground color hex value">
+                </div>
+                <p id="foreground-help" class="help-text">Select the text or foreground element color</p>
+            </div>
+
+            <div class="color-input-group">
+                <label for="background-color">Background Color</label>
+                <div class="color-picker-container">
+                    <input type="color" id="background-color" value="#ffffff" aria-describedby="background-help">
+                    <input type="text" id="background-hex" value="#ffffff" aria-label="Background color hex value">
+                </div>
+                <p id="background-help" class="help-text">Select the background color</p>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="preview-heading">
+            <h2 id="preview-heading">Live Preview</h2>
+            
+            <div class="preview-container" id="preview-container">
+                <div class="preview-text-samples">
+                    <p class="sample-normal">Normal text sample (16px)</p>
+                    <p class="sample-large">Large text sample (18pt/24px)</p>
+                    <p class="sample-bold">Bold text sample (14pt/18.67px bold)</p>
+                </div>
+                
+                <div class="preview-ui-elements">
+                    <button class="sample-button">Sample Button</button>
+                    <input type="text" class="sample-input" placeholder="Sample input field">
+                    <div class="sample-card">Sample UI Component</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-section" aria-labelledby="results-heading">
+            <h2 id="results-heading">Contrast Results</h2>
+            
+            <div class="contrast-ratio-display">
+                <span class="ratio-label">Contrast Ratio:</span>
+                <span id="contrast-ratio" class="ratio-value" aria-live="polite">21.00:1</span>
+            </div>
+
+            <div class="compliance-indicators" role="group" aria-labelledby="compliance-heading">
+                <h3 id="compliance-heading">WCAG Compliance</h3>
+                
+                <div class="compliance-grid">
+                    <div class="compliance-item">
+                        <span class="compliance-label">AA Normal Text (4.5:1)</span>
+                        <span id="aa-normal" class="compliance-status pass" aria-live="polite">PASS</span>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <span class="compliance-label">AA Large Text (3:1)</span>
+                        <span id="aa-large" class="compliance-status pass" aria-live="polite">PASS</span>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <span class="compliance-label">AAA Normal Text (7:1)</span>
+                        <span id="aaa-normal" class="compliance-status pass" aria-live="polite">PASS</span>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <span class="compliance-label">AAA Large Text (4.5:1)</span>
+                        <span id="aaa-large" class="compliance-status pass" aria-live="polite">PASS</span>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <span class="compliance-label">UI Components (3:1)</span>
+                        <span id="ui-components" class="compliance-status pass" aria-live="polite">PASS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="additional-tools" aria-labelledby="tools-heading">
+            <h2 id="tools-heading">Additional Information</h2>
+            
+            <div class="luminance-values">
+                <h3>Relative Luminance Values</h3>
+                <p>Foreground: <span id="foreground-luminance">0.00</span></p>
+                <p>Background: <span id="background-luminance">1.00</span></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built with precise WCAG 2.0/2.1/2.2 compliance calculations</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
